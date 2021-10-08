@@ -1,0 +1,45 @@
+name: ci
+
+on:
+  push:
+    branches: [ main ]
+    # ignore builds (e.g. version file)
+    paths-ignore:
+      - '**/README.md'
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    # set envvar via actions (environment)
+    env:
+      shell: pwsh
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: run pwsh script using relative path
+        run: .github\workflows\hello.ps1
+        shell: pwsh
+
+      - name: echo set env var for build job using pwsh syntax
+        run: |
+          echo ${env:shell}
+        shell: pwsh
+
+      - name: set env var via step
+        run: |
+          echo "step=true" | Out-File -FilePath $Env:GITHUB_ENV -Encoding utf-8 -Append
+        shell: pwsh
+
+      - name: echo env var set via step
+        run: |
+          echo "${env:step}"
+        shell: pwsh
+
+      - name: echo env var using action syntax
+        run: |
+          echo ${{ env.step }} 
+        shell: pwsh
+
